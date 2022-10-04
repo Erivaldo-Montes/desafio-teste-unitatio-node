@@ -18,7 +18,6 @@ describe("test", () => {
       email: "user@email.com",
     });
 
-    console.log(user);
     expect(user).toHaveProperty("id");
   });
 
