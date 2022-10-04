@@ -1,6 +1,7 @@
 import { InMemoryUsersRepository } from "../../repositories/in-memory/InMemoryUsersRepository";
 import { CreateUserUseCase } from "../createUser/CreateUserUseCase";
 import { AuthenticateUserUseCase } from "./AuthenticateUserUseCase";
+import { IncorrectEmailOrPasswordError } from "./IncorrectEmailOrPasswordError";
 
 let userRepositoryInMemory: InMemoryUsersRepository;
 let authenticateUserUseCase: AuthenticateUserUseCase;
@@ -31,8 +32,40 @@ describe("Authenticate user", () => {
       email: user.email,
     });
 
-    console.log(userAuthenticate);
-
     expect(userAuthenticate).toHaveProperty("token");
+  });
+
+  it("Should not be able to log in with a incorrect email", async () => {
+    const user = {
+      name: "Cristiano Beraldo",
+      password: "password",
+      email: "beraldo@email.com",
+    };
+
+    await createUseUseCase.execute(user);
+
+    await expect(
+      authenticateUserUseCase.execute({
+        password: user.password,
+        email: "jungkook@kpop.com",
+      })
+    ).rejects.toEqual(new IncorrectEmailOrPasswordError());
+  });
+
+  it("Should not be able to log in with a incorrect password", async () => {
+    const user = {
+      name: "Guto Zacarias",
+      password: "password",
+      email: "zacarias@email.com",
+    };
+
+    await createUseUseCase.execute(user);
+
+    await expect(
+      authenticateUserUseCase.execute({
+        password: "1234",
+        email: user.email,
+      })
+    ).rejects.toEqual(new IncorrectEmailOrPasswordError());
   });
 });
